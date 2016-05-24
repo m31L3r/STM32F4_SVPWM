@@ -27,29 +27,17 @@
 #include <stdint.h>
 #include <math.h>
 #include <arm_math.h>
+#include <pi_controller.h>
+
+
+float32_t error_sum = 0;
 
 
 /*********************************************************************
 *
-*                   Defines
+*                   Functions
 *
 *********************************************************************/
-#define _OUTMIN 2//value       // limits output alias command signal
-#define _OUTMAX 2//value       // limits output alias command signal
-#define _ERRORMIN 2//value     // limits control error
-#define _ERRORMAX 2//value     // limits control error
-#define _K_p 4
-#define _K_i 1
-
-
-/*********************************************************************
-*
-*                   Variables
-*
-*********************************************************************/
-volatile float32_t error_sum = 0;
-
-
 float PI_control(float32_t ref, float32_t real)  {
 
 	float32_t out, pi_error;
