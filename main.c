@@ -52,8 +52,7 @@
  *					Defines
  *
  ********************************************************************/
-/* Maximum Voltage from Current measurement*/
-#define _U_currentmeasue 3.3 // TO DO: Find Current Voltage ratio
+
 
 
 /***************************************************************
@@ -64,8 +63,9 @@
 float32_t	U_alpha=200, U_beta=0, Theta=0;
 float32_t	T_halfsample = 0.00003125;
 float32_t	counterfrequency = 168000000;
-float32_t	U_max = (_SQRT3/2)*_U_DC;
-float32_t	Ia=0, Ib=0, Iq_real=0, Iq_ref=0, Uq=0;	// TO DO: Formula for Iq_ref and MAximum
+float32_t	U_max = (1/_SQRT3)*_U_DC;
+float32_t	Ia=0, Ib=0, Iq_real=0, Iq_ref=0, Ud=0, Uq=0;	// TO DO: Formula for Iq_ref and MAximum
+float32_t	sinevalue=0, cosinevalue=0;
 
 
 uint16_t	*switchtime[3] = {0,0,0};
@@ -73,26 +73,13 @@ uint16_t	*switchtime[3] = {0,0,0};
 
 /*--------------Function to send strings---------------------*/
 void USART_puts(USART_TypeDef *USARTx, volatile uint8_t *string) {
+
 	while(*string) {
-		while (USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET) {
-			USART_SendData(USARTx, *string);
-		}
+		while (USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET);
+		USART_SendData(USARTx, *string);
 		string++;
 	}
 
-}
-void UART_SEND_EXAMPLE(uint8_t byte)
-{
-    USART_SendData(USART2, byte);
-}
-
-void UART_SEND_TEXT(uint8_t *buffer)
-{
-  while (*buffer)
-  {
-    UART_SEND_EXAMPLE(*buffer);
-    buffer++;
-  }
 }
 
 
@@ -116,9 +103,9 @@ int main(void) {
     SVPWM_Init();
 
     /* Init 16kHz Interrupt */
-    //INT_TIM_Config();
+    INT_TIM2_Config();
 
-    /* Init ADC1 Channel 0 */
+    /* Init ADC1 Channel 0 & ADC2 Channel1 */
     ADC123_Init();
 
     /* Configure Encoder with Tim8 on GPIOC 6 & 7 */
@@ -129,10 +116,10 @@ int main(void) {
 
     GPIO_SetBits(GPIOB, GPIO_Pin_10);
 
+
+
     while (1) {
 
-    	//USART_puts(USART2, "HALLO");
-    	USART_puts(USART2, "HELLO");
 
     }
 }

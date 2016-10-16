@@ -152,7 +152,7 @@ void SVPWM_Init(void) {
     TIM_BDTRStruct.TIM_OSSIState = TIM_OSSIState_Enable;
     TIM_BDTRStruct.TIM_LOCKLevel = TIM_LOCKLevel_1;
     /*								Config		Value */
-    TIM_BDTRStruct.TIM_DeadTime = 0b11000000 | 0b00000000;
+    TIM_BDTRStruct.TIM_DeadTime = 0b11000000 | 0b00001010;
     TIM_BDTRStruct.TIM_Break = TIM_Break_Enable;
     TIM_BDTRStruct.TIM_BreakPolarity = TIM_BreakPolarity_High;
     TIM_BDTRStruct.TIM_AutomaticOutput = TIM_AutomaticOutput_Enable;
@@ -169,35 +169,35 @@ void SVPWM_Init(void) {
  *					Timer2 as Interrupt
  *
  ********************************************************************/
-/*
-void INT_TIM_Config(void){
+
+void INT_TIM2_Config(void) {
 
 	NVIC_InitTypeDef NVIC_InitStruct;
 	TIM_TimeBaseInitTypeDef TIM_BaseStruct;
 
 	/* Enable the TIM2 global Interrupt */
-/*	NVIC_InitStruct.NVIC_IRQChannel = TIM2_IRQn;
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+	NVIC_InitStruct.NVIC_IRQChannel = TIM2_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x01;
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
 
 	/* TIM2 clock enable */
-/*	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
 	/* Time base configuration */
-/*	TIM_BaseStruct.TIM_Prescaler = 0;
+	TIM_BaseStruct.TIM_Prescaler = 0;
 	TIM_BaseStruct.TIM_Period = 5249;  // 84 MHz down to 16 KHz
 	TIM_BaseStruct.TIM_ClockDivision = 0;
 	TIM_BaseStruct.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInit(TIM2, &TIM_BaseStruct);
 
 	/* TIM IT enable */
-/*	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
 
 	/* TIM2 enable counter */
-/*	TIM_Cmd(TIM2, ENABLE);
-}*/
+	TIM_Cmd(TIM2, ENABLE);
+}
 
 
 /*********************************************************************
@@ -211,6 +211,8 @@ void configureEncoder(void) {
     GPIO_InitTypeDef GPIO_InitStruct;
     EXTI_InitTypeDef EXTI_InitStruct;
     NVIC_InitTypeDef NVIC_InitStruct;
+    TIM_ICInitTypeDef TIM_ICInitStruct;
+    TIM_TimeBaseInitTypeDef  TIM_TimeBaseStruct;
 
     /*******************************************
      *	Resolver
@@ -227,14 +229,29 @@ void configureEncoder(void) {
     GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOC, &GPIO_InitStruct);
-
     /* Alternate Function */
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM8);
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM8);
 
     /* Configure Timer */
-    TIM_EncoderInterfaceConfig(TIM8, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+    TIM_TimeBaseStruct.TIM_Prescaler = 0;
+    TIM_TimeBaseStruct.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseStruct.TIM_Period = 4095;
+    TIM_TimeBaseStruct.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStruct);
+    TIM_ARRPreloadConfig(TIM8, ENABLE);
 
+
+    /* Debounce filter */
+    TIM_ICInitStruct.TIM_Channel=TIM_Channel_1;
+    TIM_ICInitStruct.TIM_ICFilter=3;
+    TIM_ICInit(TIM8, &TIM_ICInitStruct);
+    TIM_ICInitStruct.TIM_Channel=TIM_Channel_2;
+    TIM_ICInitStruct.TIM_ICFilter=3;
+    TIM_ICInit(TIM8, &TIM_ICInitStruct);
+
+    /* Setup encoder */
+    TIM_EncoderInterfaceConfig(TIM8, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
     /* Tim8 counter enable */
     TIM_Cmd(TIM8, ENABLE);
 
@@ -268,10 +285,11 @@ void configureEncoder(void) {
     /* Add to EXTI */
     EXTI_Init(&EXTI_InitStruct);
 
+
     /* Add IRQ vector to NVIC */
     /* PC8 is connected to EXTI_Line8, which has EXTI9_5_IRQn vector */
     NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
-    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x01;
+    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x02;
     NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStruct);
@@ -317,7 +335,7 @@ void USART2_Init(void) {
 	 * Set 1 stop bit
 	 * Set Data bits to 8
 	 **********************************************************/
-	USART_InitStruct.USART_BaudRate = 9600;
+	USART_InitStruct.USART_BaudRate = 115200;
 	USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 	USART_InitStruct.USART_Parity = USART_Parity_No;
@@ -346,26 +364,41 @@ void USART2_Init(void) {
 
 /*********************************************************************
  *
- *					ADC1 Channel0 & ADC2 Channel1
+ *					ADC123
  *
  ********************************************************************/
 
 void ADC123_Init(void) {
 
-	GPIO_InitTypeDef GPIO_InitStruct;
-	ADC_InitTypeDef ADC_InitStruct;
-	ADC_CommonInitTypeDef ADC_CommonInitStruct;
+	GPIO_InitTypeDef		GPIO_InitStruct;
+	ADC_InitTypeDef			ADC_InitStruct;
+	ADC_CommonInitTypeDef	ADC_CommonInitStruct;
+	DMA_InitTypeDef			DMA_InitStruct;
 
 	/* Enable peripheral clocks */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOC, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2 | RCC_APB2Periph_ADC3, ENABLE);
+
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
+
+	/* DMA1 Stream 0 Config
+	DMA_DeInit(DMA_Channel_0);
+	DMA_InitStruct.DMA_Channel = DMA_Channel_0;
+	DMA_InitStruct.DMA_PeripheralBaseAddr = (uint32_t)&ADC3->DR;
+	DMA_InitStruct.DMA_Memory0BaseAddr = (uint32_t)ADC_DualConvertedValueTab;
+	DMA_InitStruct */
 
 	/* Configure PA0 & PA1 as analog input */
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	/* Configure PC1 as analog input */
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 	/* ADC common configuration */
 	ADC_CommonStructInit(&ADC_CommonInitStruct);
@@ -381,19 +414,28 @@ void ADC123_Init(void) {
 	ADC_InitStruct.ADC_Resolution = ADC_Resolution_12b;
 	ADC_Init(ADC1, &ADC_InitStruct);
 	ADC_Init(ADC2, &ADC_InitStruct);
+	ADC_InitStruct.ADC_NbrOfConversion = 2;
+	ADC_Init(ADC3, &ADC_InitStruct);
 
-	/* ADC1 regular channel 0 configuration */
+	/* ADC1 regular channel configuration */
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_3Cycles);
-	/* ADC2 regular channel 1 configuration */
+	/* ADC2 regular channel configuration */
 	ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 1, ADC_SampleTime_3Cycles);
+	/* ADC3 regular channel configuration*/
+	ADC_RegularChannelConfig(ADC3, ADC_Channel_10, 1, ADC_SampleTime_3Cycles);
+	ADC_RegularChannelConfig(ADC3, ADC_Channel_11, 2, ADC_SampleTime_3Cycles);
 
 	/* Enable ADC1 */
 	ADC_Cmd(ADC1, ENABLE);
 	/* Enable ADC2 */
 	ADC_Cmd(ADC2, ENABLE);
+	/* Enable ADC3 */
+	ADC_Cmd(ADC3, ENABLE);
+	ADC_DMACmd(ADC3, ENABLE);
 
 	/* Trigger first Conversion */
 	ADC_SoftwareStartConv(ADC1);
 	ADC_SoftwareStartConv(ADC2);
+	ADC_SoftwareStartConv(ADC3);
 
 }

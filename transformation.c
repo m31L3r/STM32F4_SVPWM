@@ -38,7 +38,6 @@
 float transform(float32_t current_a, float32_t current_b, float32_t theta) {
 
 	float32_t current_alpha, current_beta;
-	float32_t sinevalue, cosinevalue;
 	float32_t current_Id, current_Iq;
 
 	/* Park Transformation */

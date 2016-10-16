@@ -61,11 +61,12 @@ void svpwm(void)	{
 		U_ref = U_max;
 	}
 	float32_t	angle = Theta - (sector*_PIdiv3);
-	float32_t	U_ref_percent = (2/_SQRT3)*(U_ref/_U_DC);
+	float32_t	U_ref_percent = (_SQRT3)*(U_ref/_U_DC); // previous: (2/_SQRT3)
 	float32_t	t_1 = U_ref_percent*arm_sin_f32(_PIdiv3-angle)*T_halfsample;
 	float32_t	t_2 = U_ref_percent*arm_sin_f32(angle)*T_halfsample;
 	float32_t	t_0 = T_halfsample - t_1 - t_2;
 	float32_t	t_0_half = t_0/2;
+
 
 	/* Switching counter values for Timer Interrupts */
 

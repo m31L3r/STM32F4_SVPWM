@@ -49,7 +49,7 @@ float PI_control(float32_t ref, float32_t real)  {
     if (error_sum < _ERRORMIN)  {
       error_sum = _ERRORMIN;
     }
-    else if (error_sum < _ERRORMAX)  {
+    else if (error_sum > _ERRORMAX)  {
       error_sum = _ERRORMAX;
     }
 
