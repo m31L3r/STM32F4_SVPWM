@@ -1,4 +1,30 @@
-kladfjklakld
-
-
-fjajjdf
+/*=============================================================================
+ |   Assignment:  TPA_Frequenzumrichter
+ |
+ |	Created on:	10.01.2016
+ |          Author:	Michael Meiler
+ |    	  Language:	C, Gnu Arm Toolchain C-Compiler
+ |
+ |	To Compile:	Make sure libc and libm are defined for Linker, as well as arm_cortexM4_math lib
+ |   Compiler Flag:	-mfloat-abi=hard for FPU and in settings->targetprocessor set Float ABI = hard
+ |
+ |   	Instructor:  NAME OF YOUR COURSE'S INSTRUCTOR
+ |   	  Due Date:  DATE AND TIME THAT THIS PROGRAM IS/WAS DUE TO BE SUBMITTED
+ |
+ +-----------------------------------------------------------------------------
+ |
+ |  Description:
+ |
+ |        Input:  DESCRIBE THE INPUT THAT THE PROGRAM REQUIRES.
+ |
+ |       Output:  DESCRIBE THE OUTPUT THAT THE PROGRAM PRODUCES.
+ |
+ |    Algorithm:  OUTLINE THE APPROACH USED BY THE PROGRAM TO SOLVE THE PROBLEM.
+ |
+ |   Required Features Not Included:  DESCRIBE HERE ANY REQUIREMENTS OF 
+ |			THE ASSIGNMENT THAT THE PROGRAM DOES NOT ATTEMPT TO SOLVE.
+ |
+ |   Known Bugs:  IF THE PROGRAM DOES NOT FUNCTION CORRECTLY IN SOME
+ |      	  SITUATIONS, DESCRIBE THE SITUATIONS AND PROBLEMS HERE.
+ |
+ *===========================================================================*/
