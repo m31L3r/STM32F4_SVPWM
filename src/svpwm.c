@@ -1,6 +1,5 @@
 /*
-/*
- * svpwm.c
+ *  svpwm.c
  *
  *  Created on: 09.01.2016
  *      Author: Michael Meiler
@@ -18,34 +17,34 @@
 /*-----------------------------------Space Vector Modulation -----
 |  Function:	svpwm()
 |
-|  Purpose:		This subroutine determines the sector (1 out of 6 possible)
-|				in which the voltage vector should be modulated,
-|				then calculates the on/off times, the counter values for switching respectively.
-|				Addresses of calculated values are saved in pointer array "switchtime".
+|  Purpose:	This subroutine determines the sector (1 out of 6 possible)
+|		which the voltage vector should be modulated,
+|		then calculates the on/off times, the counter values for switching respectively.
+|		Addresses of calculated values are saved in pointer array "switchtime".
 |
 |
 |
-|  Description:	________________________________
-|			   |		|_			|_			|_
-|			   |	  |/  |		  |/  | 	  |/  |
-|			   |   0__|  /_\   1__|  /_\   2__|  /_\
-|			   |	  |\__| 	  |\__| 	  |\__|
-|	         * | *		|			|			|
-|     	  *    |    *	+-----------|-----------|-------u
-|        *     |     *	|			+-----------|-------v
-|        *     |     *	|			|			+-------w
-|         *    |    *	|			|			|
-|            * | *		|_			|_			|_
-|			   |  	  |/  |		  |/  |		  |/  |
-|			   |   3__|  /_\   4__|  /_\   5__|  /_\
-|			   |	  |\__|		  |\__|		  |\__|
-|			   |________|___________|___________|
+|  Description:	_______________________________________________________
+|			   |         __|	     __|	     __|
+|			   |	   |/  |	   |/  | 	   |/  |
+|			   |    0__|  /_\       1__|  /_\       2__|  /_\
+|			   |	   |\__| 	   |\__| 	   |\__|
+|	 		 * | *	       |	       |	       |
+|     		      *    |    *      +---------------|---------------|-------u
+|                    *     |     *     |	       +---------------|-------v
+|                    *     |     *     |	       |	       +-------w
+|                     *    |    *      |	       |	       |
+|                        * | *	     __|	     __|	     __|
+|			   |  	   |/  |	   |/  |	   |/  |
+|			   |    3__|  /_\       4__|  /_\       5__|  /_\
+|			   |	   |\__|	   |\__|	   |\__|
+|			   |___________|_______________|_______________|
 |
 |
 |  Parameters:	[in]	None.
-|						Uses global variables (Theta, U_alpha, U_beta), without changing them.
+|			Uses global variables (Theta, U_alpha, U_beta), without changing them.
 |
-|				[out]	uint16_t *switchtime[3]
+|		[out]	uint16_t *switchtime[3]
 |
 |  Returns:  	No return function used, but updates counter values in pointer array "switchtime".
 |
